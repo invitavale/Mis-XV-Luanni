@@ -1,216 +1,180 @@
 // Variables globales
 let isPlaying = false;
-let player = null;
-let playerReady = false;
 let currentSlide = 0;
 let totalSlides = 0;
-let enableMusic = false;
 
-// Funciones globales para los botones del modal
-function enterWithMusicClick() {
-    // console.log('Función enterWithMusicClick() ejecutada');
-    enableMusic = true;
-    const modal = document.getElementById('welcomeModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+// ---------- Música de fondo (archivo propio: musica.mp3) ----------
+// Plan A: elemento <audio>. Plan B (si el navegador o el visor lo bloquea):
+// Web Audio API decodificando el archivo directamente. Ambos se arrancan dentro
+// del mismo toque del botón, que es lo que exigen iPhone y Android.
+const MUSIC_FILE = 'musica.mp3';
+let musicMode = null;          // 'element' | 'webaudio'
+let audioCtx = null, webSource = null, webBuffer = null, webGain = null;
+let webStartedAt = 0, webOffset = 0, webPlaying = false;
+let fallbackTimer = null;
 
-    // El player se precarga desde DOMContentLoaded (ver loadYouTubeAPI más abajo),
-    // así que si ya está listo llamamos playVideo() de inmediato, dentro del mismo
-    // tick del click. Eso es justo lo que iOS Safari exige para permitir el audio;
-    // si el player se crea o se reproduce de forma asíncrona (fuera del gesto del
-    // usuario), iOS lo bloquea en silencio y por eso antes no sonaba en iPhone.
-    if (playerReady && player) {
-        document.getElementById('musicPlayer').style.display = 'block';
-        player.unMute();
-        player.setVolume(100);
-        player.playVideo();
-        isPlaying = true;
-        updateMusicIcon();
-        // En iOS/Safari a veces el primer playVideo() no arranca el audio
-        // aunque sí "conecta" el gesto; reintentamos una vez, todavía
-        // dentro del mismo ciclo de interacción del usuario.
-        setTimeout(() => {
-            if (player && typeof player.getPlayerState === 'function' && player.getPlayerState() !== 1) {
-                player.unMute();
-                player.playVideo();
-            }
-        }, 300);
+function getAudio() { return document.getElementById('bgMusic'); }
+
+function b64ToBytes(b64) {
+    const bin = atob(b64), out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+}
+function prepareAudioElement() {
+    const a = getAudio();
+    if (!a) return;
+    if (window.__MUSIC_B64 && !a.src) {
+        try {
+            const blob = new Blob([b64ToBytes(window.__MUSIC_B64)], { type: 'audio/mpeg' });
+            a.src = URL.createObjectURL(blob);
+        } catch (e) {}
+    } else if (!a.getAttribute('src')) {
+        a.src = MUSIC_FILE;
     }
-    // Si el player todavía no está listo (conexión lenta), onPlayerReady se
-    // encarga de reproducir apenas termine de inicializar.
+}
+function getMusicBytes() {
+    if (window.__MUSIC_B64) return Promise.resolve(b64ToBytes(window.__MUSIC_B64).buffer);
+    return fetch(MUSIC_FILE).then(r => r.arrayBuffer());
 }
 
+function startWebAudio() {
+    // Se crea/reanuda el contexto dentro del toque (desbloquea el audio);
+    // la decodificación puede terminar después sin problema.
+    try {
+        if (!audioCtx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            audioCtx = new AC();
+            webGain = audioCtx.createGain();
+            webGain.connect(audioCtx.destination);
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        // sonido silencioso inmediato para "despertar" el audio en iOS
+        const s = audioCtx.createBufferSource();
+        s.buffer = audioCtx.createBuffer(1, 1, 22050);
+        s.connect(audioCtx.destination); s.start(0);
+    } catch (e) { return; }
+    const go = () => {
+        if (musicMode === 'element') return;
+        musicMode = 'webaudio';
+        playWebAudio();
+    };
+    if (webBuffer) { go(); return; }
+    getMusicBytes()
+        .then(buf => new Promise((res, rej) => audioCtx.decodeAudioData(buf, res, rej)))
+        .then(b => { webBuffer = b; go(); })
+        .catch(() => {});
+}
+function playWebAudio() {
+    if (!audioCtx || !webBuffer) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    webSource = audioCtx.createBufferSource();
+    webSource.buffer = webBuffer;
+    webSource.loop = true;
+    webSource.connect(webGain);
+    webSource.start(0, webOffset % webBuffer.duration);
+    webStartedAt = audioCtx.currentTime - webOffset;
+    webPlaying = true; isPlaying = true; updateMusicIcon();
+}
+function pauseWebAudio() {
+    if (!webSource) return;
+    webOffset = audioCtx.currentTime - webStartedAt;
+    try { webSource.stop(); } catch (e) {}
+    webSource = null; webPlaying = false; isPlaying = false; updateMusicIcon();
+}
+
+function startMusic() {
+    const audio = getAudio();
+    const musicPlayer = document.getElementById('musicPlayer');
+    if (musicPlayer) musicPlayer.style.display = 'block';
+
+    // Plan B se prepara en el mismo toque, por si el Plan A falla
+    startWebAudio();
+
+    if (!audio) return;
+    audio.muted = false;
+    audio.volume = 1;
+    let p;
+    try { p = audio.play(); } catch (e) { p = Promise.reject(e); }
+    const failA = () => { if (musicMode !== 'webaudio') { musicMode = null; } };
+    if (p && typeof p.then === 'function') {
+        p.then(() => {
+            // Plan A sonando: apagar el Plan B si llegó a arrancar
+            musicMode = 'element';
+            if (webPlaying) { pauseWebAudio(); webOffset = 0; }
+            isPlaying = true; updateMusicIcon();
+        }).catch(failA);
+    }
+    // si en 2.5 s el <audio> no avanza, nos quedamos con Web Audio
+    clearTimeout(fallbackTimer);
+    fallbackTimer = setTimeout(() => {
+        if (musicMode === 'element' && (audio.paused || audio.currentTime < 0.2)) {
+            try { audio.pause(); } catch (e) {}
+            musicMode = 'webaudio';
+            if (webBuffer && !webPlaying) playWebAudio();
+        }
+    }, 2500);
+}
+
+function closeWelcome() {
+    const modal = document.getElementById('welcomeModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+function enterWithMusicClick() { closeWelcome(); startMusic(); }
 function enterWithoutMusicClick() {
-    // console.log('Función enterWithoutMusicClick() ejecutada');
-    enableMusic = false;
-    const modal = document.getElementById('welcomeModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+    closeWelcome();
+    const musicPlayer = document.getElementById('musicPlayer');
+    if (musicPlayer) musicPlayer.style.display = 'block';   // por si luego quiere activarla
+    isPlaying = false; updateMusicIcon();
 }
+function enterInvitation() { enterWithMusicClick(); }
 
-// Función para configurar los botones directamente
-function setupModalButtons() {
-    const enterWithMusic = document.getElementById('enterWithMusic');
-    const enterWithoutMusic = document.getElementById('enterWithoutMusic');
-    const modal = document.getElementById('welcomeModal');
-
-    // console.log('Configurando botones del modal...', { enterWithMusic, enterWithoutMusic, modal });
-
-    if (enterWithMusic) {
-        enterWithMusic.onclick = function() {
-            // console.log('Botón CON música clickeado');
-            enableMusic = true;
-            if (modal) {
-                modal.style.display = 'none';
-            }
-            // Mismo arreglo que en enterWithMusicClick: reproducir de forma
-            // síncrona dentro del click si el player ya está precargado.
-            if (playerReady && player) {
-                const musicPlayer = document.getElementById('musicPlayer');
-                if (musicPlayer) musicPlayer.style.display = 'block';
-                player.unMute();
-                player.setVolume(100);
-                player.playVideo();
-                isPlaying = true;
-                updateMusicIcon();
-                setTimeout(() => {
-                    if (player && typeof player.getPlayerState === 'function' && player.getPlayerState() !== 1) {
-                        player.unMute();
-                        player.playVideo();
-                    }
-                }, 300);
-            }
-        };
+function toggleMusic() {
+    const audio = getAudio();
+    if (musicMode === 'webaudio') {
+        if (webPlaying) pauseWebAudio(); else playWebAudio();
+        return;
     }
-
-    if (enterWithoutMusic) {
-        enterWithoutMusic.onclick = function() {
-            // console.log('Botón SIN música clickeado');
-            enableMusic = false;
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        };
+    if (musicMode === 'element' && audio) {
+        if (audio.paused) audio.play().catch(() => {}); else audio.pause();
+        return;
     }
+    // aún no ha sonado nada (entró sin música): arrancar ahora
+    startMusic();
 }
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    // console.log('DOM cargado, inicializando...');
     initializeCountdown();
     initializeCarousel();
-    setupModalButtons();
 
-    // Mostrar el modal de bienvenida para elegir con/sin música
     const modal = document.getElementById('welcomeModal');
-    if (modal) {
-        modal.style.display = 'flex';
+    if (modal) modal.style.display = 'flex';
+
+    const toggle = document.getElementById('musicToggle');
+    if (toggle) toggle.addEventListener('click', toggleMusic);
+
+    prepareAudioElement();
+    const audio = getAudio();
+    if (audio) {
+        audio.addEventListener('playing', () => { if (musicMode !== 'webaudio') { musicMode = 'element'; isPlaying = true; updateMusicIcon(); } });
+        audio.addEventListener('pause', () => { if (musicMode === 'element') { isPlaying = false; updateMusicIcon(); } });
+        audio.addEventListener('error', () => {
+            if (musicMode !== 'webaudio') { musicMode = 'webaudio'; if (webBuffer && !webPlaying) playWebAudio(); }
+        });
     }
-
-    // Se precarga el player de YouTube desde el inicio (no en el click) para
-    // que playVideo() pueda ejecutarse de forma síncrona dentro del gesto del
-    // usuario en enterWithMusicClick(). Esto es lo que exige iOS Safari.
-    loadYouTubeAPI();
-});
-
-// También configurar cuando la página esté completamente cargada
-window.addEventListener('load', function() {
-    // console.log('Ventana completamente cargada');
-    setupModalButtons();
-});
-
-
-
-// Cargar la API de YouTube
-function loadYouTubeAPI() {
-    const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
-    document.body.appendChild(script);
-    window.onYouTubeIframeAPIReady = initializeYouTubePlayer;
-}
-
-// Función llamada por la API de YouTube
-function initializeYouTubePlayer() {
-    if (player) return; // ya inicializado, evita crear el player dos veces
-
-    player = new YT.Player('youtube-player', {
-        height: '1',
-        width: '1',
-        videoId: 'vwp1yxtcD7I',
-        playerVars: {
-            autoplay: 0,
-            controls: 0,
-            disablekb: 1,
-            fs: 0,
-            loop: 1,
-            modestbranding: 1,
-            playsinline: 1,
-            rel: 0,
-            showinfo: 0,
-            iv_load_policy: 3,
-            playlist: 'vwp1yxtcD7I'
-        },
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange,
-            'onError': onPlayerError
+    // Si el usuario cambia de pestaña o bloquea el teléfono, pausar; al volver, continuar
+    let resumeOnReturn = false;
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            resumeOnReturn = isPlaying;
+            if (musicMode === 'webaudio') pauseWebAudio(); else { const a = getAudio(); if (a) a.pause(); }
+        } else if (resumeOnReturn) {
+            if (musicMode === 'webaudio') playWebAudio(); else { const a = getAudio(); if (a) a.play().catch(() => {}); }
         }
     });
-}
-
-function onPlayerReady(event) {
-    playerReady = true;
-    const musicPlayer = document.getElementById('musicPlayer');
-    const musicToggle = document.getElementById('musicToggle');
-
-    if (musicToggle) {
-        musicToggle.addEventListener('click', toggleMusic);
-    }
-
-    // Caso borde: el usuario ya hizo click en "con música" antes de que el
-    // player terminara de inicializar (ej. conexión lenta). Lo reproducimos
-    // apenas esté listo.
-    if (enableMusic && !isPlaying) {
-        if (musicPlayer) musicPlayer.style.display = 'block';
-        event.target.unMute();
-        event.target.setVolume(100);
-        event.target.playVideo();
-        isPlaying = true;
-        updateMusicIcon();
-    }
-}
-
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.PLAYING) {
-        isPlaying = true;
-    } else if (event.data === YT.PlayerState.PAUSED) {
-        isPlaying = false;
-    }
-    updateMusicIcon();
-}
-
-function onPlayerError(event) {
-    console.log('Error al cargar el video de YouTube');
-    const musicPlayer = document.getElementById('musicPlayer');
-    musicPlayer.style.display = 'block';
-    isPlaying = false;
-    updateMusicIcon();
-}
-
-function toggleMusic() {
-    if (player) {
-        if (isPlaying) {
-            player.pauseVideo();
-            isPlaying = false;
-        } else {
-            player.playVideo();
-            isPlaying = true;
-        }
-        updateMusicIcon();
-    }
-}
+});
 
 function updateMusicIcon() {
     const volumeIcon = document.getElementById('volumeIcon');

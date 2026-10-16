@@ -2546,3 +2546,4 @@ body { color: var(--lila-800); }
 @media (min-width: 900px) {
     .party-grid { grid-template-columns: repeat(3, minmax(220px, 270px)) !important; }
 }
+.btn-enter { padding: .8rem 2.6rem !important; font-size: 1.1rem; letter-spacing: .14em; text-transform: uppercase; }

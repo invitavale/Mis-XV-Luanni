@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CCSB.css?v=44">
+    <link rel="stylesheet" href="CCSB.css?v=45">
     <style>
         /* Carrusel: 3 imágenes simultáneamente con foto central destacada */
         .carousel-track-container { overflow: hidden; width: 100%; position: relative; }
@@ -98,8 +98,8 @@
                 <h1 class="welcome-title welcome-title-sm">Bienvenidos a la<br/>invitación de mis<br/>XV Años</h1>
                 <p class="welcome-note">La música de fondo es parte de la experiencia</p>
                 <div class="welcome-actions">
-                    <button id="enterWithMusic" class="btn-gold" onclick="enterWithMusicClick()">Ingresar con música</button>
-                    <button id="enterWithoutMusic" class="btn-gold-outline" onclick="enterWithoutMusicClick()">Ingresar sin música</button>
+                    <button id="enterWithMusic" class="btn-gold" onclick="enterWithMusicClick()">Entrar con música</button>
+                    <button id="enterWithoutMusic" class="btn-gold-outline" onclick="enterWithoutMusicClick()">Entrar sin música</button>
                 </div>
             </div>
         </div>
@@ -112,7 +112,7 @@
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.08" stroke="#fff" stroke-width="2"></path>
                 </svg>
             </button>
-            <div id="youtube-player" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>
+            <audio id="bgMusic" src="musica.mp3" preload="auto" loop playsinline></audio>
         </div>
 
         <div class="page" id="page">
@@ -390,7 +390,7 @@
             } catch(e) {}
         })();
         </script>
-        <script src="JAVAB.js?v=35" defer></script>
+        <script src="JAVAB.js?v=37" defer></script>
         <script src="cabello.js?v=5" defer></script>
 </body>
 </html>
