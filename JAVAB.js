@@ -363,10 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Funciones de los botones
 function openLocation(location) {
-    // Enlaces de ejemplo (dirección ficticia) - ceremonia y celebración
+    // Casa del abogado Joaquín
     const mapsUrls = {
-        ceremony: "https://maps.app.goo.gl/jGF4dqpyfrakbxSTA",
-        reception: "https://maps.app.goo.gl/jGF4dqpyfrakbxSTA"
+        ceremony: "https://maps.app.goo.gl/vC11VswoY4TNdrLw7",
+        reception: "https://maps.app.goo.gl/vC11VswoY4TNdrLw7"
     };
     const mapsUrl = mapsUrls[location] || mapsUrls.ceremony;
     window.open(mapsUrl, '_blank');
@@ -377,8 +377,7 @@ function openLocation(location) {
 // regalos, etc.) cuando personalices la invitación.
 
 function sharePhotos() {
-    // Ejemplo: aquí se debe colocar el enlace real a la carpeta de Google Drive.
-    window.open('https://photos.app.goo.gl/p9PGQHWrvLG1Bpj28', '_blank');
+    window.open('https://photos.app.goo.gl/CD3JMfxcuTyoF6ZR8', '_blank');
 }
 
 function showDressCode() {
@@ -402,8 +401,7 @@ function showGifts() {
 }
 
 function confirmAttendance() {
-    // Ejemplo: aquí se debe colocar el enlace real al formulario de Google Forms.
-    window.open('https://docs.google.com/forms/d/e/1FAIpQLSdIYoM33yAkMmS4DZCRVmO9_IE0gZT4eEw8cV0r2PgWlYE0Ag/viewform?usp=header', '_blank');
+    window.open('https://docs.google.com/forms/d/e/1FAIpQLSd5L-s8Tl-NB-LVPgMBanpjb8LrRA0fNXRJ2WNmMoT4ozhP1A/viewform?usp=publish-editor', '_blank');
 }
 
 // Sistema de Toast

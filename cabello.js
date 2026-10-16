@@ -90,10 +90,10 @@
     pts.push([x0, y0], [x0, y0 + rap.h * 0.10]);
     pts.push([x0 - W * 0.04, Math.max(H + 40, y0 + rap.h * 0.25)]);
 
-    var sel = ['.countdown-section .card', '.events-section .card', '.gallery-section .card',
+    var sel = ['.countdown-section .card', '.events-section .card',
                '.party-section .party-grid', '.gifts-section .card', '.rsvp-section .card'];
-    var cards = sel.map(function (s) { return rel(document.querySelector(s)); });
-    var wrap = { 1: true, 4: true };   // en estas pasa por delante de la esquina
+    var cards = sel.filter(function (s) { return document.querySelector(s); }).map(function (s) { return rel(document.querySelector(s)); });
+    var wrap = { 1: true, 3: true };   // en estas pasa por delante de la esquina
 
     cards.forEach(function (c, i) {
       var s = (i % 2 === 0) ? -1 : 1;    // lado por donde entra: izq, der, izq...
@@ -131,7 +131,7 @@
     pts.push([E[0] + 34, E[1]]);
     pts.push(E);
 
-    return { pts: pts, w0: w0, wE: wE, fronts: fronts, W: W, Htot: page.scrollHeight,
+    return { pts: pts, w0: w0, wE: wE, fronts: fronts, W: W, Htot: Math.ceil(foot.b),
              tieTop: [x0, rap.t + rap.h * 0.90, w0], tieEnd: [E[0], E[1], wE] };
   }
 

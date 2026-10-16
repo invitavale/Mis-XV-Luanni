@@ -10,84 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CCSB.css?v=45">
-    <style>
-        /* Carrusel: 3 imágenes simultáneamente con foto central destacada */
-        .carousel-track-container { overflow: hidden; width: 100%; position: relative; }
-        .carousel-track { display: flex; transition: transform 0.5s ease; width: 100%; overflow: visible; }
-        .carousel-item {
-            flex: 0 0 33.333%;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-        }
-        .carousel-item img {
-            display: block;
-            width: auto; height: auto;
-            max-width: 100%; max-height: 100%;
-            object-fit: contain;
-            border-radius: 0;
-            box-shadow: 0 10px 24px rgba(110,82,150,0.30);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        /* Marco tipo polaroid plateado */
-        .framed-photo {
-            width: auto !important; height: auto !important;
-            max-width: 100% !important; max-height: 100% !important;
-            box-sizing: border-box !important;
-            margin: 0 auto;
-            object-fit: contain !important;
-            background: #E9EAEE !important;
-            border: 6px solid #E9EAEE !important;
-            border-bottom-width: 20px !important;
-            outline: 1px solid #B9BDC6;
-        }
-        @media (min-width: 769px) {
-            .carousel-item.is-center .framed-photo {
-                transform: scale(1.12) rotate(-0.2deg);
-                box-shadow: 0 34px 68px rgba(110,82,150,0.38);
-            }
-        }
-        @media (max-width: 768px) {
-            .carousel-item {
-                flex: 0 0 100% !important;
-                padding: 0 6px !important;
-                height: 380px !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-            }
-            .carousel-item img {
-                width: auto !important; height: auto !important;
-                max-width: 100% !important; max-height: 380px !important;
-                object-fit: contain !important;
-                transform: none !important;
-            }
-            .framed-photo { border-width: 4px !important; border-bottom-width: 14px !important; }
-            .carousel-track-container { height: auto !important; }
-        }
-        @media (max-width: 480px) {
-            .carousel-item img {
-                width: auto !important; height: auto !important;
-                max-width: 100% !important; max-height: 320px !important;
-                object-fit: contain !important;
-                border-radius: 0;
-                transform: none !important;
-            }
-            .framed-photo { border-width: 3px !important; border-bottom-width: 10px !important; }
-            .carousel-item { flex: 0 0 100% !important; padding: 0 8px !important; height: 320px !important; }
-            .carousel-track-container { height: auto !important; }
-        }
-        .carousel-container { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
-        .carousel-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            border: none; font-size: 2rem; cursor: pointer; z-index: 2;
-            padding: 0 10px; border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-    </style>
+    <link rel="stylesheet" href="CCSB.css?v=47">
 </head>
 <body>
     <div class="main-center">
@@ -224,43 +147,6 @@
             </div>
         </section>
 
-        <!-- Photo Gallery -->
-        <div class="section-divider"><img src="img/separador-sol.webp" alt=""></div>
-        <section class="gallery-section">
-            <div class="card gallery-container">
-                <h2 class="section-title">Retratos de mis 15 Años</h2>
-                <p class="section-subtitle">Cada foto guarda un pedacito de esta historia que hoy ilumina el cielo</p>
-
-                <div class="camera-icon modern-icon">
-                    <svg width="70" height="70" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="6" y="18" width="52" height="36" rx="6" fill="#7B5AA6"/>
-                        <rect x="24" y="10" width="16" height="10" rx="2" fill="#7B5AA6"/>
-                        <circle cx="32" cy="36" r="11" fill="#F4F0FA"/>
-                        <circle cx="32" cy="36" r="6" fill="#7B5AA6"/>
-                        <circle cx="48" cy="26" r="2.5" fill="#F4F0FA"/>
-                    </svg>
-                </div>
-                <!-- Carrusel -->
-                <div class="carousel-container">
-                  <button class="carousel-btn carousel-prev" id="prevBtn">❮</button>
-                  <div class="carousel-track-container">
-                    <div class="carousel-track" id="carouselTrack">
-                      <div class="carousel-item"><img class="framed-photo" src="foto1.jpg" alt="Foto 1 de los XV años"></div>
-                      <div class="carousel-item"><img class="framed-photo" src="foto2.jpg" alt="Foto 2 de los XV años"></div>
-                      <div class="carousel-item"><img class="framed-photo" src="foto3.jpg" alt="Foto 3 de los XV años"></div>
-                      <div class="carousel-item"><img class="framed-photo" src="foto4.jpg" alt="Foto 4 de los XV años"></div>
-                      <div class="carousel-item"><img class="framed-photo" src="foto5.jpg" alt="Foto 5 de los XV años"></div>
-                      <div class="carousel-item"><img class="framed-photo" src="foto6.jpg" alt="Foto 6 de los XV años"></div>
-                    </div>
-                  </div>
-                  <button class="carousel-btn carousel-next" id="nextBtn">❯</button>
-                </div>
-                <div class="carousel-counter">
-                  <span id="currentSlide">1</span> / <span id="totalSlides">6</span> fotos
-                </div>
-            </div>
-        </section>
-
         <!-- Party Information -->
         <div class="section-divider"><img src="img/separador-sol.webp" alt=""></div>
         <section class="party-section">
@@ -276,7 +162,7 @@
                         </div>
                         <h3>Código de Vestimenta</h3>
                         <p><strong>Formal</strong></p>
-                        <p class="dress-note">El color morado es exclusivo de la cumpleañera</p>
+                        <p class="dress-note">El color morado lila es exclusivo de la cumpleañera</p>
                         <button class="btn-wedding" onclick="showDressCode()">Ver más</button>
                     </div>
                     <div class="party-card">
@@ -315,11 +201,10 @@
             <img class="deco deco-lazo" src="img/lazo.webp" alt="" aria-hidden="true">
             <div class="card gifts-container">
                 <h2 class="section-title">Regalos</h2>
-                <p class="section-subtitle">Si deseas regalarme algo más que tu hermosa presencia.</p>
+                <p class="section-subtitle">Lo más importante para mí es tu presencia en este día tan especial.</p>
                 <div class="gift-icon modern-icon">
                     <img src="icono-regalo.png" alt="Regalo" class="icon-img">
                 </div>
-                <button class="btn-wedding" onclick="showGifts()">Ver más</button>
             </div>
         </section>
 
@@ -368,9 +253,9 @@
                 <button class="modal-close" onclick="closeDressCodeModal()" aria-label="Cerrar">&times;</button>
                 <h2 class="modal-title-dark">Código de Vestimenta</h2>
                 <p class="modal-text-dark"><strong>Formal</strong></p>
-                <p class="modal-text-dark">El color morado es exclusivo de la cumpleañera</p>
+                <p class="modal-text-dark">El color morado lila es exclusivo de la cumpleañera</p>
                 <div class="dresscode-colors">
-                    <span class="color-dot color-dot-reserved" style="background:#7B3FA8;" title="Morado: reservado para la cumpleañera"></span>
+                    <span class="color-dot color-dot-reserved" style="background:#B57EDC;" title="Morado lila: reservado para la cumpleañera"></span>
                 </div>
             </div>
         </div>
@@ -390,7 +275,7 @@
             } catch(e) {}
         })();
         </script>
-        <script src="JAVAB.js?v=37" defer></script>
-        <script src="cabello.js?v=5" defer></script>
+        <script src="JAVAB.js?v=38" defer></script>
+        <script src="cabello.js?v=6" defer></script>
 </body>
 </html>
