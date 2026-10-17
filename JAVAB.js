@@ -397,8 +397,20 @@ function closeDressCodeModal() {
 }
 
 function showGifts() {
-    window.open('https://cuentapro11.github.io/numero-cuenta-ejemplo/', '_blank');
+    const m = document.getElementById('giftsModal');
+    if (!m) return;
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    const box = m.querySelector('.gifts-modal');
+    if (box) box.scrollTop = 0;
 }
+function closeGiftsModal(e) {
+    if (e && e.target && e.target.id !== 'giftsModal') return;
+    const m = document.getElementById('giftsModal');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeGiftsModal(); });
 
 function confirmAttendance() {
     window.open('https://docs.google.com/forms/d/e/1FAIpQLSd5L-s8Tl-NB-LVPgMBanpjb8LrRA0fNXRJ2WNmMoT4ozhP1A/viewform?usp=publish-editor', '_blank');
@@ -444,3 +456,96 @@ function showToast(title, message) {
     clearCaches();
   }
 })();
+
+// ---------- Mesa de regalos conectada a Supabase (proyecto Invitavale) ----------
+const GIFTS_API = 'https://nsujtmfmyoeibbvwkzez.supabase.co/rest/v1/rpc/';
+const GIFTS_KEY = 'sb_publishable_vngm39TRXt50jchjL2_gGQ_kZIl_n_P';
+const GIFTS_EVENT = 'xv-luanni';
+let giftsPoll = null, giftPending = null, giftBusy = false;
+
+function giftsRpc(fn, body) {
+    return fetch(GIFTS_API + fn, {
+        method: 'POST',
+        headers: { 'apikey': GIFTS_KEY, 'Authorization': 'Bearer ' + GIFTS_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+function myGifts() { try { return JSON.parse(localStorage.getItem('xv-luanni-mis-regalos') || '[]'); } catch (e) { return []; } }
+function saveMyGift(id) { try { const a = myGifts(); if (!a.includes(id)) a.push(id); localStorage.setItem('xv-luanni-mis-regalos', JSON.stringify(a)); } catch (e) {} }
+
+function markGifts(taken) {
+    const mine = myGifts();
+    document.querySelectorAll('.gift-item').forEach(li => {
+        const id = li.dataset.id, st = li.querySelector('.gift-status');
+        const isTaken = taken.includes(id);
+        li.classList.toggle('is-taken', isTaken);
+        li.classList.toggle('is-mine', isTaken && mine.includes(id));
+        li.setAttribute('aria-disabled', isTaken ? 'true' : 'false');
+        if (st) st.textContent = isTaken ? (mine.includes(id) ? 'Lo elegiste tú ♥' : 'No disponible') : 'Disponible';
+    });
+}
+function giftsSync(msg) { const el = document.getElementById('giftsSync'); if (el) el.textContent = msg || ''; }
+
+function loadClaimedGifts() {
+    return giftsRpc('get_claimed_gifts', { p_event: GIFTS_EVENT })
+        .then(list => { markGifts(Array.isArray(list) ? list : []); giftsSync(''); })
+        .catch(() => giftsSync('No pudimos cargar la disponibilidad. Revisa tu conexión.'));
+}
+function openGiftConfirm(li) {
+    if (li.classList.contains('is-taken') || giftBusy) return;
+    giftPending = li.dataset.id;
+    document.getElementById('giftConfirmName').textContent = li.querySelector('.gift-name').textContent + '?';
+    document.getElementById('giftConfirmImg').src = li.querySelector('.gift-thumb').src;
+    document.getElementById('giftConfirm').hidden = false;
+    document.getElementById('giftConfirmYes').focus();
+}
+function closeGiftConfirm() { giftPending = null; document.getElementById('giftConfirm').hidden = true; }
+
+function confirmGift() {
+    if (!giftPending || giftBusy) return;
+    const id = giftPending, yes = document.getElementById('giftConfirmYes');
+    giftBusy = true; yes.disabled = true; yes.textContent = 'Guardando…';
+    giftsRpc('claim_gift', { p_event: GIFTS_EVENT, p_item_id: id })
+        .then(res => {
+            closeGiftConfirm();
+            if (res && res.ok) {
+                saveMyGift(id);
+                showToast('¡Gracias!', 'Tu regalo quedó registrado. Luanni lo agradece de corazón.');
+            } else if (res && res.reason === 'taken') {
+                showToast('Ya fue elegido', 'Alguien más eligió este regalo hace un momento. Escoge otro, por favor.');
+            } else {
+                showToast('Ups', 'No se pudo registrar. Intenta de nuevo.');
+            }
+            return loadClaimedGifts();
+        })
+        .catch(() => { closeGiftConfirm(); showToast('Sin conexión', 'No se pudo registrar tu regalo. Revisa tu internet e intenta de nuevo.'); })
+        .finally(() => { giftBusy = false; yes.disabled = false; yes.textContent = 'Confirmar'; });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.gift-item').forEach(li => {
+        li.addEventListener('click', () => openGiftConfirm(li));
+        li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openGiftConfirm(li); } });
+    });
+    const y = document.getElementById('giftConfirmYes'), n = document.getElementById('giftConfirmNo'), box = document.getElementById('giftConfirm');
+    if (y) y.addEventListener('click', confirmGift);
+    if (n) n.addEventListener('click', closeGiftConfirm);
+    if (box) box.addEventListener('click', e => { if (e.target === box) closeGiftConfirm(); });
+});
+
+// al abrir la mesa: cargar disponibilidad y refrescar cada 20 s mientras esté abierta
+const _showGiftsBase = showGifts;
+showGifts = function () {
+    _showGiftsBase();
+    giftsSync('Cargando disponibilidad…');
+    loadClaimedGifts();
+    clearInterval(giftsPoll);
+    giftsPoll = setInterval(loadClaimedGifts, 20000);
+};
+const _closeGiftsBase = closeGiftsModal;
+closeGiftsModal = function (e) {
+    if (e && e.target && e.target.id !== 'giftsModal') return;
+    clearInterval(giftsPoll);
+    closeGiftConfirm();
+    _closeGiftsBase();
+};

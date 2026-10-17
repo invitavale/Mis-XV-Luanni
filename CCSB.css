@@ -2553,3 +2553,89 @@ body { color: var(--lila-800); }
 /* la portada nunca crece de más aunque el visor sea muy alto */
 .hero-section { max-height: 1100px; }
 .gifts-container .section-subtitle { margin-bottom: .6rem; }
+
+/* v48 — Mesa de regalos */
+.gifts-modal {
+    position: relative;
+    width: min(92vw, 760px);
+    max-height: 86vh;
+    max-height: 86svh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background: linear-gradient(180deg, #FBF9FE 0%, #F1EAFA 100%);
+    border: 1px solid #C7CBD3;
+    border-radius: 26px;
+    box-shadow: inset 0 0 0 6px rgba(255,255,255,.6), inset 0 0 0 7px rgba(185,190,200,.7), 0 30px 60px -20px rgba(30,18,50,.6);
+    padding: 2rem 1.2rem 1.6rem;
+    text-align: center;
+}
+.gifts-modal .modal-close {
+    position: sticky; top: 0; float: right; margin: -1rem -0.4rem 0 0;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1px solid #C7CBD3; background: #fff; color: var(--lila-700);
+    font-size: 1.6rem; line-height: 1; cursor: pointer; z-index: 2;
+}
+.gifts-modal-crown { width: 70px; height: auto; display: block; margin: 0 auto .2rem; filter: drop-shadow(0 4px 8px rgba(180,130,60,.35)); }
+.gifts-modal-title { font-family: 'Great Vibes', cursive; font-weight: 400; font-size: clamp(2.4rem, 9vw, 3.2rem); color: var(--lila-700); line-height: 1.1; }
+.gifts-modal-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.12rem; color: var(--lila-800); max-width: 480px; margin: .3rem auto 1.3rem; }
+.gift-list {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr; gap: .6rem;
+    text-align: left;
+}
+@media (min-width: 640px) { .gift-list { grid-template-columns: 1fr 1fr; } }
+.gift-item {
+    display: flex; align-items: center; gap: .8rem;
+    background: rgba(255,255,255,.88);
+    border: 1px solid #E2DAF0;
+    border-radius: 16px;
+    padding: .5rem .8rem .5rem .5rem;
+    box-shadow: 0 6px 14px -10px rgba(59,42,85,.45);
+}
+.gift-thumb {
+    flex: 0 0 auto;
+    width: 64px; height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #D9CCEE, 0 4px 10px -4px rgba(59,42,85,.4);
+    background: #EFE8F8;
+}
+.gift-thumb-ph { display: flex; align-items: center; justify-content: center; }
+.gift-num { font-family: 'Cinzel', serif; font-size: .78rem; color: var(--plata-dark); letter-spacing: .08em; min-width: 1.4rem; }
+.gift-name { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.12rem; color: var(--lila-900); line-height: 1.25; }
+
+/* v49 — mesa de regalos con reservas */
+.gift-item { cursor: pointer; position: relative; transition: transform .15s ease, box-shadow .2s ease, opacity .3s ease; }
+.gift-item:hover:not(.is-taken), .gift-item:focus-visible { transform: translateY(-1px); box-shadow: 0 0 0 2px var(--lila-300), 0 8px 16px -10px rgba(59,42,85,.5); outline: none; }
+.gift-name { flex: 1; }
+.gift-status {
+    flex: 0 0 auto; font-family: 'Cinzel', serif; font-size: .64rem; letter-spacing: .06em;
+    color: #4E8A5E; background: #E9F5EC; border: 1px solid #CBE5D2; border-radius: 999px; padding: .2rem .55rem;
+}
+.gift-item.is-taken { cursor: default; opacity: .62; }
+.gift-item.is-taken .gift-thumb { filter: grayscale(.85); }
+.gift-item.is-taken .gift-name { text-decoration: line-through; text-decoration-color: rgba(75,59,99,.45); }
+.gift-item.is-taken .gift-status { color: #8E949F; background: #F1F1F4; border-color: #DADCE2; }
+.gift-item.is-mine { opacity: .9; }
+.gift-item.is-mine .gift-status { color: var(--lila-700); background: #F1EAFA; border-color: var(--lila-200); }
+.gifts-sync { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--plata-dark); min-height: 1.2em; margin: -.6rem 0 .8rem; }
+.gift-confirm {
+    position: fixed; inset: 0; z-index: 10001;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(43,30,64,.55); padding: 1rem;
+}
+.gift-confirm[hidden] { display: none; }
+.gift-confirm-box {
+    width: min(340px, 92vw); background: #FBF9FE; border-radius: 24px; padding: 1.5rem 1.2rem 1.3rem; text-align: center;
+    border: 1px solid #C7CBD3; box-shadow: inset 0 0 0 5px rgba(255,255,255,.6), inset 0 0 0 6px rgba(185,190,200,.7), 0 24px 50px -18px rgba(30,18,50,.6);
+}
+.gift-confirm-img { width: 96px; height: 96px; object-fit: cover; border-radius: 16px; border: 3px solid #fff; box-shadow: 0 0 0 1px #D9CCEE, 0 8px 16px -8px rgba(59,42,85,.5); }
+.gift-confirm-q { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--lila-800); margin-top: .8rem; }
+.gift-confirm-name { font-family: 'Cinzel', serif; font-size: 1.05rem; color: var(--lila-700); margin: .1rem 0 1.1rem; }
+.gift-confirm-actions { display: flex; flex-direction: column; gap: .6rem; align-items: center; }
+.gift-cancel { background: none; border: none; color: var(--plata-dark); font-family: 'Cinzel', serif; letter-spacing: .06em; cursor: pointer; padding: .4rem 1rem; }
+@media (max-width: 380px) { .gift-status { font-size: .58rem; padding: .18rem .45rem; } .gift-num { display: none; } }
+.toast { z-index: 10010 !important; }
+.gift-item.is-mine .gift-name { text-decoration: none; } .gift-item.is-mine .gift-thumb { filter: none; }

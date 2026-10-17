@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="CCSB.css?v=47">
+    <link rel="stylesheet" href="CCSB.css?v=49">
 </head>
 <body>
     <div class="main-center">
@@ -205,6 +205,7 @@
                 <div class="gift-icon modern-icon">
                     <img src="icono-regalo.png" alt="Regalo" class="icon-img">
                 </div>
+                <button class="btn-wedding" onclick="showGifts()">Ver mesa de regalos</button>
             </div>
         </section>
 
@@ -247,6 +248,60 @@
         </div>
         </div><!-- /page -->
 
+        <!-- Modal Mesa de Regalos -->
+        <div id="giftsModal" class="modal-overlay" onclick="closeGiftsModal(event)">
+            <div class="gifts-modal" onclick="event.stopPropagation()" role="dialog" aria-labelledby="giftsTitle">
+                <button class="modal-close" onclick="closeGiftsModal()" aria-label="Cerrar">&times;</button>
+                <img class="gifts-modal-crown" src="img/corona.webp" alt="" aria-hidden="true">
+                <h2 class="gifts-modal-title" id="giftsTitle">Mesa de Regalos</h2>
+                <p class="gifts-modal-sub">Tu presencia es lo más importante. Si deseas obsequiarme algo, toca el regalo que quieras y confírmalo para que nadie más lo repita.</p>
+                <p class="gifts-sync" id="giftsSync" aria-live="polite"></p>
+                <ul class="gift-list">
+                    <li class="gift-item" data-id="iphone" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/iphone.webp" alt="" width="64" height="64"><span class="gift-num">01</span><span class="gift-name">iPhone 15 rosado</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="monitor-presion" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/monitor-presion.webp" alt="" width="64" height="64"><span class="gift-num">02</span><span class="gift-name">Monitor de presión arterial</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="pestanas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/pestanas.webp" alt="" width="64" height="64"><span class="gift-num">03</span><span class="gift-name">Pestañas postizas</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="pulseras" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/pulseras.webp" alt="" width="64" height="64"><span class="gift-num">04</span><span class="gift-name">Pulseras</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="my-melody" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/my-melody.webp" alt="" width="64" height="64"><span class="gift-num">05</span><span class="gift-name">Peluche de My Melody</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="stanley-rosado" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/stanley-rosado.webp" alt="" width="64" height="64"><span class="gift-num">06</span><span class="gift-name">Vaso térmico Stanley</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="estuche-organizador" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/estuche-organizador.webp" alt="" width="64" height="64"><span class="gift-num">07</span><span class="gift-name">Estuche organizador</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="brumas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/brumas.webp" alt="" width="64" height="64"><span class="gift-num">08</span><span class="gift-name">Brumas corporales</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="atomizador" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/atomizador.webp" alt="" width="64" height="64"><span class="gift-num">09</span><span class="gift-name">Botella atomizador</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="camara" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/camara.webp" alt="" width="64" height="64"><span class="gift-num">10</span><span class="gift-name">Cámara instantánea</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="oso" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/oso.webp" alt="" width="64" height="64"><span class="gift-num">11</span><span class="gift-name">Oso de peluche</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="mini-peluche" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/mini-peluche.webp" alt="" width="64" height="64"><span class="gift-num">12</span><span class="gift-name">Set de regalo de mini peluche</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="balsamos" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/balsamos.webp" alt="" width="64" height="64"><span class="gift-num">13</span><span class="gift-name">Kit de bálsamos labiales</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="cuidado-personal" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/cuidado-personal.webp" alt="" width="64" height="64"><span class="gift-num">14</span><span class="gift-name">Kit de cuidado personal</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="caja-cartas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/caja-cartas.webp" alt="" width="64" height="64"><span class="gift-num">15</span><span class="gift-name">Caja de cartas</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="kit-vaso" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/kit-vaso.webp" alt="" width="64" height="64"><span class="gift-num">16</span><span class="gift-name">Kit de regalo con vaso</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="macbook" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/macbook.webp" alt="" width="64" height="64"><span class="gift-num">17</span><span class="gift-name">MacBook</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="airpods-max" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/airpods-max.webp" alt="" width="64" height="64"><span class="gift-num">18</span><span class="gift-name">AirPods Max</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="set-unas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/set-unas.webp" alt="" width="64" height="64"><span class="gift-num">19</span><span class="gift-name">Set de uñas</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="maquillaje-holografico" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/maquillaje-holografico.webp" alt="" width="64" height="64"><span class="gift-num">20</span><span class="gift-name">Kit de maquillaje holográfico</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="stanley-azul" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/stanley-azul.webp" alt="" width="64" height="64"><span class="gift-num">21</span><span class="gift-name">Vaso térmico Stanley azul</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="set-peluches" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/set-peluches.webp" alt="" width="64" height="64"><span class="gift-num">22</span><span class="gift-name">Set de peluches</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="joyero" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/joyero.webp" alt="" width="64" height="64"><span class="gift-num">23</span><span class="gift-name">Joyero musical</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="brazo-practicas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/brazo-practicas.webp" alt="" width="64" height="64"><span class="gift-num">24</span><span class="gift-name">Modelo de brazo para prácticas</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="instrumental" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/instrumental.webp" alt="" width="64" height="64"><span class="gift-num">25</span><span class="gift-name">Estuche de instrumental quirúrgico</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="almohadillas" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/almohadillas.webp" alt="" width="64" height="64"><span class="gift-num">26</span><span class="gift-name">Almohadillas de sutura</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="crocs" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/crocs.webp" alt="" width="64" height="64"><span class="gift-num">27</span><span class="gift-name">Crocs</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="jordan4" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/jordan4.webp" alt="" width="64" height="64"><span class="gift-num">28</span><span class="gift-name">Tenis Air Jordan 4</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="set-facial" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/set-facial.webp" alt="" width="64" height="64"><span class="gift-num">29</span><span class="gift-name">Set de cuidado facial</span><span class="gift-status">Disponible</span></li>
+                    <li class="gift-item" data-id="littmann" tabindex="0" role="button"><img class="gift-thumb" src="img/regalos/littmann.webp" alt="" width="64" height="64"><span class="gift-num">30</span><span class="gift-name">Estetoscopio Littmann Classic III</span><span class="gift-status">Disponible</span></li>
+                </ul>
+                <div class="gift-confirm" id="giftConfirm" hidden>
+                    <div class="gift-confirm-box">
+                        <img class="gift-confirm-img" id="giftConfirmImg" src="" alt="">
+                        <p class="gift-confirm-q">¿Confirmas que regalarás</p>
+                        <p class="gift-confirm-name" id="giftConfirmName"></p>
+                        <div class="gift-confirm-actions">
+                            <button class="btn-wedding" id="giftConfirmYes">Confirmar</button>
+                            <button class="gift-cancel" id="giftConfirmNo">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Dress Code -->
         <div id="dresscodeModal" class="modal-overlay" onclick="closeDressCodeModal(event)">
             <div class="dresscode-modal" onclick="event.stopPropagation()">
@@ -275,7 +330,7 @@
             } catch(e) {}
         })();
         </script>
-        <script src="JAVAB.js?v=38" defer></script>
+        <script src="JAVAB.js?v=40" defer></script>
         <script src="cabello.js?v=6" defer></script>
 </body>
 </html>
